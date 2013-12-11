@@ -5,7 +5,10 @@
  *
  * Adds a color selection widget to the specified TVs.
  *
- * @uses ManagerManager plugin 0.4.
+ * @uses ManagerManager plugin 0.6.
+ * 
+ * @event OnDocFormPrerender
+ * @event OnDocFormRender
  *
  * @link http://code.divandesign.biz/modx/mm_widget_colors/1.1
  *
@@ -13,11 +16,20 @@
  */
 
 function mm_widget_colors($fields, $default = '#ffffff', $roles = '', $templates = ''){
-	global $modx, $content, $mm_fields;
+	if (!useThisRule($roles, $templates)){return;}
+	
+	global $modx;
 	$e = &$modx->Event;
 	
-	if ($e->name == 'OnDocFormRender' && useThisRule($roles, $templates)){
-		$output = '';
+	$output = '';
+	
+	if ($e->name == 'OnDocFormPrerender'){
+		$output .= includeJsCss($modx->config['base_url'] .'assets/plugins/managermanager/widgets/colors/farbtastic.js', 'html', 'farbtastic', '1.2');
+		$output .= includeJsCss($modx->config['base_url'] .'assets/plugins/managermanager/widgets/colors/farbtastic.css', 'html');
+		
+		$e->output($output);
+	}else if ($e->name == 'OnDocFormRender'){
+		global $content, $mm_fields;
 		
 		// if we've been supplied with a string, convert it into an array
 		$fields = makeArray($fields);
@@ -37,12 +49,6 @@ function mm_widget_colors($fields, $default = '#ffffff', $roles = '', $templates
 		if ($tv_count === false){
 			return;
 		}
-		
-		// Insert some JS
-		$output .= includeJs($modx->config['base_url'] .'assets/plugins/managermanager/widgets/colors/farbtastic.js');
-		
-		// Insert some CSS
-		$output .= includeCss($modx->config['base_url'] .'assets/plugins/managermanager/widgets/colors/farbtastic.css');
 		
 		// Go through each of the fields supplied
 		foreach ($fields as $tv){
