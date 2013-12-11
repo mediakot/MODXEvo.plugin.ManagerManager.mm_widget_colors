@@ -29,22 +29,13 @@ function mm_widget_colors($fields, $default = '#ffffff', $roles = '', $templates
 		
 		$e->output($output);
 	}else if ($e->name == 'OnDocFormRender'){
-		global $content, $mm_fields;
+		global $mm_current_page, $mm_fields;
 		
 		// if we've been supplied with a string, convert it into an array
 		$fields = makeArray($fields);
 		
-		// Which template is this page using?
-		if (isset($content['template'])){
-			$page_template = $content['template'];
-		}else{
-			// If no content is set, it's likely we're adding a new page at top level.
-			// So use the site default template. This may need some work as it might interfere with a default template set by MM?
-			$page_template = $modx->config['default_template'];
-		}
-		
 		// Does this page's template use any of these TVs? If not, quit.
-		$tv_count = tplUseTvs($page_template, $fields);
+		$tv_count = tplUseTvs($mm_current_page['template'], $fields);
 		
 		if ($tv_count === false){
 			return;
